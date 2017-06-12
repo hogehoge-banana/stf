@@ -2,17 +2,17 @@ require('./device-booking.less')
 var _ = require('lodash')
 
 module.exports =
-  function DeviceBookingServiceFactory($modal, $location, $window, $filter,
-                                       gettext //, DeviceScheduleService, UserService
+  function DeviceBookingServiceFactory($uibModal, $location, $window, $filter,
+                                       gettext, DeviceScheduleService, UserService
                                       ) {
     var service = {}
-//    var curUser = UserService.currentUser
+    var curUser = UserService.currentUser
     var translate = $filter('translate')
     var MY_BOOK = translate(gettext('Reserved'))
     var OTHERS = translate(gettext('Other'))
     var ONEHOURE = 60 * 60 * 1000
 
-    var ModalInstanceCtrl = function($scope, $modalInstance, device) {
+    var ModalInstanceCtrl = function($scope, $uibModalInstance, device) {
       $scope.device = device
       $scope.events = []
       $scope.targetDate = new Date()
@@ -25,11 +25,11 @@ module.exports =
 
       // modal controll
       $scope.ok = function() {
-        $modalInstance.close(true)
+        $uibModalInstance.close(true)
       }
 
       $scope.cancel = function() {
-        $modalInstance.dismiss('cancel')
+        $uibModalInstance.dismiss('cancel')
       }
 
       // schedule booking
@@ -44,7 +44,7 @@ module.exports =
         , end: newEnd
         }
         if (validate(newEvent)) {
-//          DeviceScheduleService.update(newEvent)
+          DeviceScheduleService.update(newEvent)
 
           event.startsAt = newStart
           event.endsAt = newEnd
@@ -128,7 +128,21 @@ module.exports =
               })
             })
           })
-*/
+         */
+        // TODO: remove
+        $scope.events.push({
+          schedule: {},
+          title: 'test title', //MY_BOOK + '&nbsp;&#128270;',
+          color: {primary: '#e3bc08', secondary: '#fdf1ba'},
+          startsAt: new Date(),
+          endsAt: new Date(new Date().getTime() + 5 * 60 * 1000),
+          deletable: true,
+          draggable: true,
+          resizable: true,
+          cssClass: 'a-css-class-name',
+          own: true
+        })
+
       }
 
       function validate(newSchedule) {
@@ -163,7 +177,7 @@ module.exports =
     }
 
     service.open = function(device) {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         size: 'lg',
         template: require('./device-booking.pug'),
         controller: ModalInstanceCtrl,

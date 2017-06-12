@@ -34,7 +34,8 @@
     "d3": "~3.5.14",
     "spin.js": "~2.3.2",
     "angular-xeditable": "~0.1.9",
-    "angular-bootstrap-calendar": "^0.29.1"
+    "angular-bootstrap-calendar": "^0.29.1",
+    "interactjs": "^1.2.8"
   },
   "private": true,
   "devDependencies": {

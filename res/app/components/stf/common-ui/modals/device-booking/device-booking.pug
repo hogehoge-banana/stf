@@ -10,10 +10,10 @@
       .col-md-6
         .row
           .events-area
-            mwl-calendar(view='"day"', current-day='targetDate', events='events', auto-open="true", on-timespan-click='addRecord(calendarDate)', on-event-times-changed='eventEdited(calendarEvent, calendarNewEventStart, calendarNewEventEnd)', on-event-click="eventClick(calendarEvent)").device-schedule
+            mwl-calendar(view='"day"', view-date='targetDate', events='events', auto-open="true", day-view-split='30', on-timespan-click='addRecord(calendarDate)', on-event-times-changed='eventEdited(calendarEvent, calendarNewEventStart, calendarNewEventEnd)', on-event-click="eventClick(calendarEvent)").device-schedule
       .col-md-6
         .schedule-targetdate.center-block
-          datepicker(ng-model='targetDate', min-date='datepicker.minDate').well.well-sm
+          uib-datepicker(ng-model='targetDate', min-date='datepicker.minDate').well.well-sm
         .widget-container(ng-show='selected != null')
           .heading
             stacked-icon(icon='fa-location-arrow', color='color-pink')
