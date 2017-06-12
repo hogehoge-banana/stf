@@ -115,6 +115,10 @@ module.exports = function DeviceListCtrl(
       name: 'owner'
     , selected: true
     }
+  , {
+      name: 'book'
+    , selected: true
+    }
   ]
 
   $scope.columns = defaultColumns

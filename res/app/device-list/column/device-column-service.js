@@ -274,6 +274,17 @@ module.exports = function DeviceColumnService($filter, gettext) {
         return device.owner ? device.enhancedUserProfileUrl : ''
       }
     })
+  , book: ButtonCell({
+      title: gettext('Book')
+    , target: '_blank'
+    , escape: false
+    , value: function() {
+        return '&#9997;'
+      }
+    , click: function(device) {
+        alert(device.serial)
+      }
+    })
   }
 }
 
@@ -427,6 +438,42 @@ function LinkCell(options) {
       }
       a.target = options.target || ''
       t.nodeValue = options.value(item)
+      return td
+    }
+  , compare: function(a, b) {
+      return compareIgnoreCase(options.value(a), options.value(b))
+    }
+  , filter: function(item, filter) {
+      return filterIgnoreCase(options.value(item), filter.query)
+    }
+  })
+}
+
+function ButtonCell(options) {
+  return _.defaults(options, {
+    title: options.title
+  , defaultOrder: 'asc'
+  , escape: true
+  , build: function() {
+      var td = document.createElement('td')
+      var b = document.createElement('button')
+      if (options.escape) {
+        b.appendChild(document.createTextNode(''))
+      }
+      td.appendChild(b)
+      return td
+    }
+  , update: function(td, item) {
+      var b = td.firstChild
+      b.onclick = function() {
+        options.click(item)
+      }
+      var text = options.value(item)
+      if (options.escape) {
+        b.firstChild.nodeValue = text
+      } else {
+        b.innerHTML = text
+      }
       return td
     }
   , compare: function(a, b) {
