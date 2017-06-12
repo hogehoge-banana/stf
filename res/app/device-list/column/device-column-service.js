@@ -18,7 +18,7 @@ var filterOps = {
   }
 }
 
-module.exports = function DeviceColumnService($filter, gettext) {
+module.exports = function DeviceColumnService($filter, gettext, DeviceBookingService) {
   // Definitions for all possible values.
   return {
     state: DeviceStatusCell({
@@ -282,7 +282,7 @@ module.exports = function DeviceColumnService($filter, gettext) {
         return '&#9997;'
       }
     , click: function(device) {
-        alert(device.serial)
+        DeviceBookingService.open(device)
       }
     })
   }
