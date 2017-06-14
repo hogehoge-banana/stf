@@ -2,15 +2,15 @@ require('./device-booking.less')
 var _ = require('lodash')
 
 module.exports =
-  function DeviceBookingServiceFactory($uibModal, $location, $window, $filter,
-                                       gettext, DeviceScheduleService, UserService
-                                      ) {
+  function DeviceBookingServiceFactory($uibModal, $location, $window, $filter, gettext,
+                                       calendarConfig, DeviceScheduleService, UserService) {
     var service = {}
     var curUser = UserService.currentUser
     var translate = $filter('translate')
     var MY_BOOK = translate(gettext('Reserved'))
     var OTHERS = translate(gettext('Other'))
     var ONEHOURE = 60 * 60 * 1000
+    var COLOR_PENDING = calendarConfig.colorTypes.important
 
     var ModalInstanceCtrl = function($scope, $uibModalInstance, device) {
       $scope.device = device
@@ -48,10 +48,9 @@ module.exports =
 
           event.startsAt = newStart
           event.endsAt = newEnd
-          event.deletable = false
           event.draggable = false
           event.resizable = false
-          event.type = 'important'
+          event.color = COLOR_PENDING
         }
       }
 
@@ -61,16 +60,15 @@ module.exports =
         _.remove($scope.events, function(event) {
           return event.schedule.id === target.schedule.id
         })
-        /*
         DeviceScheduleService.remove({
           id: target.schedule.id
         , serial: target.schedule.serial
         })
-*/
       }
 
-      $scope.addRecord = function(startDate) {
-        var endTime = startDate.getTime() + 30 * 60 * 1000
+      $scope.addRecord = function(calendarDate) {
+        var startDate = calendarDate.utc()
+        var endTime = startDate + 30 * 60 * 1000
         var endDate = new Date(endTime)
         var newSchedule = {
           id: null,
@@ -82,15 +80,14 @@ module.exports =
           var newEvent = {
             schedule: newSchedule,
             title: 'new',
-            type: 'important',
-            startsAt: startDate,
-            endsAt: endDate,
-            deletable: false,
+            startsAt: new Date(startDate),
+            endsAt: new Date(endDate),
             draggable: false,
-            resizable: false
+            resizable: false,
+            color: COLOR_PENDING
           }
           $scope.events.push(newEvent)
-//          DeviceScheduleService.add(newSchedule)
+          DeviceScheduleService.add(newSchedule)
         }
       }
 
@@ -107,46 +104,35 @@ module.exports =
       })
 
       // utility
+
+      function makeEvent(schedule) {
+        var own = curUser.email === schedule.email
+        return {
+          schedule: schedule,
+          title: (own ? MY_BOOK : OTHERS) + '&nbsp;&#128270;',
+          startsAt: new Date(schedule.start),
+          endsAt: new Date(schedule.end),
+          color: own ? calendarConfig.colorTypes.success :
+             calendarConfig.colorTypes.warning,
+          actions: [],
+          draggable: own,
+          resizable: own,
+          cssClass: 'a-css-class-name',
+          own: own
+        }
+      }
       function loadEvents() {
-        /*
         DeviceScheduleService.load(device.serial, $scope.targetDate)
           .then(function(schedules) {
             $scope.events = []
-            _.forEach(schedules, function(schedule){
-              var own = curUser.email == schedule.email;
-              $scope.events.push({
-                schedule: schedule,
-                title: (own? MY_BOOK : OTHERS) + '&nbsp;&#128270;',
-                type: own? 'success': 'warning',
-                startsAt: new Date(schedule.start),
-                endsAt: new Date(schedule.end),
-                deletable: own,
-                draggable: own,
-                resizable: own,
-                cssClass: 'a-css-class-name',
-                own: own
-              })
+            _.forEach(schedules, function(schedule) {
+              $scope.events.push(makeEvent(schedule))
             })
           })
-         */
-        // TODO: remove
-        $scope.events.push({
-          schedule: {},
-          title: 'test title', //MY_BOOK + '&nbsp;&#128270;',
-          color: {primary: '#e3bc08', secondary: '#fdf1ba'},
-          startsAt: new Date(),
-          endsAt: new Date(new Date().getTime() + 5 * 60 * 1000),
-          deletable: true,
-          draggable: true,
-          resizable: true,
-          cssClass: 'a-css-class-name',
-          own: true
-        })
-
       }
 
       function validate(newSchedule) {
-        var diff = newSchedule.start.getTime() - Date.now()
+        var diff = newSchedule.start - Date.now()
         if (diff < ONEHOURE) {
           return false
         }
@@ -154,8 +140,8 @@ module.exports =
         _.forEach($scope.events, function(event) {
           var schedule = event.schedule
           if (newSchedule.id !== schedule.id &&
-              newSchedule.start.getTime() < new Date(schedule.end).getTime() &&
-              new Date(schedule.start).getTime() < newSchedule.end.getTime()) {
+              newSchedule.start < schedule.end &&
+              schedule.start < newSchedule.end) {
             result = false
             return false
           }
