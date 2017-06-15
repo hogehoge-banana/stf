@@ -1,4 +1,3 @@
-
 module.exports = function DeviceScheduleServiceFactory($q, $http, $rootScope, socket) {
   var deviceScheduleService = {}
 
@@ -17,11 +16,17 @@ module.exports = function DeviceScheduleServiceFactory($q, $http, $rootScope, so
   deviceScheduleService.load = function(serial, date) {
     var from = getTargetDate(date)
     var to = getNextDate(date)
-    var reqUrl = '/app/api/v1/device-schedule/' + serial + '/' + from.getTime() + '/' + to.getTime()
-    return $http.get(reqUrl)
-      .then(function(response) {
-        return response.data.schedules
-      })
+    var reqUrl = '/api/v1/schedules/' + serial
+
+    return $http.get(reqUrl, {
+      params: {
+        start: from.getTime()
+      , end: to.getTime()
+      }
+    })
+    .then(function(response) {
+      return response.data.schedules
+    })
   }
 
   deviceScheduleService.add = function(data) {
