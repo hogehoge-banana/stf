@@ -263,6 +263,41 @@ paths:
             $ref: "#/definitions/ErrorResponse"
       security:
         - accessTokenAuth: []
+  /schedules/{serial}:
+    x-swagger-router-controller: schedule
+    get:
+      summary: Schedule Information
+      description: The schedule enpoint return information list of specified device schedules
+      operationId: getSchedulesBySerial
+      tags:
+        - devices
+      parameters:
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          type: string
+        - name: start
+          in: query
+          description: Fields query parameter takes utc timestamp. The schedules will be filtered by the end time later than specified timestamp.
+          required: false
+          type: integer
+        - name: end
+          in: query
+          description: Fields query parameter takes utc timestamp. The schedules will be filtered by the end time earlier than specified timestamp.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: List of Schedules
+          schema:
+            $ref: "#/definitions/ScheduleListResponse"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - accessTokenAuth: []
   /swagger.json:
     x-swagger-pipe: swagger_raw
 definitions:
@@ -314,6 +349,14 @@ definitions:
       timeout:
         description: Device timeout in ms. If device is kept idle for this period, it will be automatically disconnected. Default is provider group timeout
         type: integer
+  ScheduleListResponse:
+    required:
+      - schedules
+    properties:
+      schedules:
+        type: array
+        items:
+          type: object
   ErrorResponse:
     required:
       - message
