@@ -20,7 +20,7 @@ module.exports =
       $scope.selected = null
       $scope.datepicker = {
         minDate: new Date()
-        , opened: false
+      , opened: false
       }
 
       // modal controll
@@ -67,25 +67,24 @@ module.exports =
       }
 
       $scope.addRecord = function(calendarDate) {
-        var startDate = calendarDate.utc()
-        var endTime = startDate + 30 * 60 * 1000
+        console.log(calendarDate)
+        var startTime = calendarDate.utc()
+        var endTime = startTime + 30 * 60 * 1000
         var endDate = new Date(endTime)
         var newSchedule = {
-          id: null,
-          serial: device.serial,
-          start: startDate,
-          end: endDate,
+          id: null
+        , email: curUser.email
+        , serial: device.serial
+        , start: startTime
+        , end: endTime
         }
         if (validate(newSchedule)) {
-          var newEvent = {
-            schedule: newSchedule,
-            title: 'new',
-            startsAt: new Date(startDate),
-            endsAt: new Date(endDate),
-            draggable: false,
-            resizable: false,
-            color: COLOR_PENDING
-          }
+          var newEvent = makeEvent(newSchedule)
+          newEvent.title = 'new'
+          newEvent.draggable = false
+          newEvent.resizable = false
+          newEvent.color = COLOR_PENDING
+
           $scope.events.push(newEvent)
           DeviceScheduleService.add(newSchedule)
         }
@@ -139,15 +138,14 @@ module.exports =
         var result = true
         _.forEach($scope.events, function(event) {
           var schedule = event.schedule
-          if (newSchedule.id !== schedule.id &&
-              newSchedule.start < schedule.end &&
-              schedule.start < newSchedule.end) {
-            result = false
-            return false
+          if (newSchedule.start <= schedule.end &&
+              schedule.start <= newSchedule.end) {
+            if (!schedule.id || newSchedule.id !== schedule.id) {
+              result = false
+              return false
+            }
           }
-          else {
-            return true
-          }
+          return true
         })
         return result
       }
