@@ -459,6 +459,12 @@ definitions:
       end:
         description: The end time utc timestamp in ms.
         type: integer
+  ScheduleResponse:
+    required:
+      - schedule
+    properties:
+      schedule:
+        type: object
   ErrorResponse:
     required:
       - message
