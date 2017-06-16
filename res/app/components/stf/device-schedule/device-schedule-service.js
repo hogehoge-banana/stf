@@ -30,27 +30,12 @@ module.exports = function DeviceScheduleServiceFactory($q, $http, $rootScope, so
   }
 
   deviceScheduleService.add = function(data) {
-    socket.emit('deviceSchedule.add', {
-      serial: data.serial
-    , start: data.start
-    , end: data.end
-    })
   }
 
   deviceScheduleService.update = function(data) {
-    socket.emit('deviceSchedule.update', {
-      id: data.id
-    , serial: data.serial
-    , start: data.start
-    , end: data.end
-    })
   }
 
   deviceScheduleService.remove = function(data) {
-    socket.emit('deviceSchedule.remove', {
-      id: data.id
-    , serial: data.serial
-    })
   }
 
   socket.on('deviceSchedule.updated', function(message) {
