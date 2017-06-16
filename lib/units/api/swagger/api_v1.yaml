@@ -298,6 +298,97 @@ paths:
             $ref: "#/definitions/ErrorResponse"
       security:
         - accessTokenAuth: []
+    post:
+      summary: Add new schedule Information
+      description: The schedule enpoint register new reservation schedule
+      operationId: addSchedule
+      tags:
+        - schedules
+      parameters:
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          type: string
+        - name: schedule
+          in: body
+          description: Fields schedule parameter takes reservation data.
+          required: true
+          schema:
+            $ref: "#/definitions/ScheduleRequest"
+      responses:
+        "201":
+          description: Registerd schedule
+          schema:
+            $ref: "#/definitions/ScheduleResponse"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - accessTokenAuth: []
+  /schedules/{serial}/{id}:
+    x-swagger-router-controller: schedule
+    put:
+      summary: Update schedule
+      description: The schedule enpoint updates specified reservation schedule
+      operationId: updateSchedule
+      tags:
+        - schedules
+      parameters:
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: Schedule id
+          required: true
+          type: string
+        - name: schedule
+          in: body
+          description: Fields schedule parameter takes reservation data.
+          required: true
+          schema:
+            $ref: "#/definitions/ScheduleRequest"
+      responses:
+        "201":
+          description: Registerd schedule
+          schema:
+            $ref: "#/definitions/ScheduleResponse"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - accessTokenAuth: []
+    delete:
+      summary: Delete schedule
+      description: The schedule enpoint removes specified reservation schedule
+      operationId: deleteSchedule
+      tags:
+        - schedules
+      parameters:
+        - name: serial
+          in: path
+          description: Device Serial
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: Schedule id
+          required: true
+          type: string
+      responses:
+        "204":
+          description: No Contents
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      security:
+        - accessTokenAuth: []
   /swagger.json:
     x-swagger-pipe: swagger_raw
 definitions:
@@ -357,6 +448,17 @@ definitions:
         type: array
         items:
           type: object
+  ScheduleRequest:
+    required:
+      - start
+      - end
+    properties:
+      start:
+        description: The start time utc timestamp in ms.
+        type: integer
+      end:
+        description: The end time utc timestamp in ms.
+        type: integer
   ErrorResponse:
     required:
       - message
