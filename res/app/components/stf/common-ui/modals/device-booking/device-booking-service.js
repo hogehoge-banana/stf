@@ -36,16 +36,17 @@ module.exports =
 
       $scope.eventEdited = function(event, newStart, newEnd) {
         $scope.selected = null
+        var startTime = newStart.valueOf()
+        var endTime = newEnd.valueOf()
 
-        var newEvent = {
+        var newSchedule = {
           id: event.schedule.id
         , serial: event.schedule.serial
-        , start: newStart
-        , end: newEnd
+        , start: startTime
+        , end: endTime
         }
-        if (validate(newEvent)) {
-          DeviceScheduleService.update(newEvent)
-
+        if (validate(newSchedule)) {
+          DeviceScheduleService.update(device.serial, event.schedule.id, startTime, endTime)
           event.startsAt = newStart
           event.endsAt = newEnd
           event.draggable = false
@@ -60,15 +61,11 @@ module.exports =
         _.remove($scope.events, function(event) {
           return event.schedule.id === target.schedule.id
         })
-        DeviceScheduleService.remove({
-          id: target.schedule.id
-        , serial: target.schedule.serial
-        })
+        DeviceScheduleService.remove(target.schedule.serial, target.schedule.id)
       }
 
       $scope.addRecord = function(calendarDate) {
-        console.log(calendarDate)
-        var startTime = calendarDate.utc()
+        var startTime = calendarDate.valueOf()
         var endTime = startTime + 30 * 60 * 1000
         var endDate = new Date(endTime)
         var newSchedule = {
@@ -86,7 +83,7 @@ module.exports =
           newEvent.color = COLOR_PENDING
 
           $scope.events.push(newEvent)
-          DeviceScheduleService.add(newSchedule)
+          DeviceScheduleService.add(device.serial, startTime, endTime)
         }
       }
 

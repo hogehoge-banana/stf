@@ -23,19 +23,41 @@ module.exports = function DeviceScheduleServiceFactory($q, $http, $rootScope, so
         start: from.getTime()
       , end: to.getTime()
       }
+      , cache: false
     })
     .then(function(response) {
       return response.data.schedules
     })
   }
 
-  deviceScheduleService.add = function(data) {
+  deviceScheduleService.add = function(serial, start, end) {
+    var reqUrl = '/api/v1/schedules/' + serial
+
+    return $http.post(reqUrl, {
+        start: start
+      , end: end
+    })
+    .then(function(response) {
+      return response.data
+    })
   }
 
-  deviceScheduleService.update = function(data) {
+  deviceScheduleService.update = function(serial, id, start, end) {
+    var reqUrl = '/api/v1/schedules/' + serial + '/' + id
+    return $http.put(reqUrl, {
+      start: start, end: end
+    })
+    .then(function(response) {
+      return response.data
+    })
   }
 
-  deviceScheduleService.remove = function(data) {
+  deviceScheduleService.remove = function(serial, id) {
+    var reqUrl = '/api/v1/schedules/' + serial + '/' + id
+    return $http.delete(reqUrl)
+      .then(function(response) {
+        return response.data
+      })
   }
 
   socket.on('deviceSchedule.updated', function(message) {

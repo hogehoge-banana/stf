@@ -31,8 +31,8 @@
               .form-group
                 label(translate).col-sm-2.control-label Start
                 .col-sm-10
-                  span.form-control-static {{ selected.schedule.start | date : 'HH:mm'}}
+                  span.form-control-static {{ selected.startsAt | date : 'HH:mm'}}
               .form-group
                 label(translate).col-sm-2.control-label End
                 .col-sm-10
-                  span.form-control-static {{ selected.schedule.end | date : 'HH:mm'}}
+                  span.form-control-static {{ selected.endsAt | date : 'HH:mm'}}
