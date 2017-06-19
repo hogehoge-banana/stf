@@ -576,8 +576,9 @@ message ReserveMessage {
 }
 
 message ReserveUpdateMessage {
-  optional ReserveMessage current = 1;
-  optional ReserveMessage next = 2;
+  required string serial = 1;
+  optional ReserveMessage current = 2;
+  optional ReserveMessage next = 3;
 }
 
 
