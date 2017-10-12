@@ -1,6 +1,10 @@
 require('./device-booking.less')
 var _ = require('lodash')
 
+var ONEHOURE = 60 * 60 * 1000
+var END_TIME_OFFSET = 60 * 1000
+var INITIAL_RESERVE_TIME = 30 * 60 * 1000
+
 module.exports =
   function DeviceBookingServiceFactory($uibModal, $location, $window, $filter, gettext,
                                        calendarConfig, DeviceScheduleService, UserService) {
@@ -9,7 +13,6 @@ module.exports =
     var translate = $filter('translate')
     var MY_BOOK = translate(gettext('Reserved'))
     var OTHERS = translate(gettext('Other'))
-    var ONEHOURE = 60 * 60 * 1000
     var COLOR_PENDING = calendarConfig.colorTypes.important
 
     var ModalInstanceCtrl = function($scope, $uibModalInstance, device) {
@@ -65,16 +68,7 @@ module.exports =
       }
 
       $scope.addRecord = function(calendarDate) {
-        var startTime = calendarDate.valueOf()
-        var endTime = startTime + 30 * 60 * 1000
-        var endDate = new Date(endTime)
-        var newSchedule = {
-          id: null
-        , email: curUser.email
-        , serial: device.serial
-        , start: startTime
-        , end: endTime
-        }
+        var newSchedule = makeInitialSchedule(calendarDate)
         if (validate(newSchedule)) {
           var newEvent = makeEvent(newSchedule)
           newEvent.title = 'new'
@@ -83,7 +77,7 @@ module.exports =
           newEvent.color = COLOR_PENDING
 
           $scope.events.push(newEvent)
-          DeviceScheduleService.add(device.serial, startTime, endTime)
+          DeviceScheduleService.add(device.serial, newSchedule.start, newSchedule.end)
         }
       }
 
@@ -100,6 +94,18 @@ module.exports =
       })
 
       // utility
+
+      function makeInitialSchedule(selectedMoment) {
+        var startTime = selectedMoment.valueOf()
+        var endTime = startTime + INITIAL_RESERVE_TIME - END_TIME_OFFSET
+        return {
+          id: null
+        , email: curUser.email
+        , serial: device.serial
+        , start: startTime
+        , end: endTime
+        }
+      }
 
       function makeEvent(schedule) {
         var own = curUser.email === schedule.email
